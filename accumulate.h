@@ -1,7 +1,7 @@
 #pragma once
 
 template<typename Iterator, typename T>
-struct accumulateBlock
+struct AccumulateBlock
 {
     void operator () (Iterator begin, Iterator end, T& result)
     {
@@ -11,7 +11,7 @@ struct accumulateBlock
 };
 
 template<typename Iterator, typename T>
-T parallelAccumulate(Iterator begin, Iterator end, T init)
+T parallel_accumulate(Iterator begin, Iterator end, T init)
 {
     const auto length = std::distance(begin, end);
     if (length == 0) {
@@ -30,11 +30,11 @@ T parallelAccumulate(Iterator begin, Iterator end, T init)
     for(unsigned long i = 0; i < numberOfThreads - 1; ++i) {
         auto blockEnd = blockBegin;
         std::advance(blockEnd, blockSize);
-        threads[i] = std::thread(accumulateBlock<Iterator, T>(), blockBegin, blockEnd, std::ref(results[i]));
+        threads[i] = std::thread(AccumulateBlock<Iterator, T>(), blockBegin, blockEnd, std::ref(results[i]));
         blockBegin = blockEnd;
     }
 
-    accumulateBlock<Iterator, T>()(blockBegin, end, results[numberOfThreads - 1]);
+    AccumulateBlock<Iterator, T>()(blockBegin, end, results[numberOfThreads - 1]);
 
     for(auto& thread : threads) {
         thread.join();
@@ -43,7 +43,7 @@ T parallelAccumulate(Iterator begin, Iterator end, T init)
     return std::accumulate(results.begin(), results.end(), init);
 }
 
-void testParallelAccumulate()
+void test_parallel_accumulate()
 {
     int numberOfValues = 1000;
     std::vector<int> v(numberOfValues);
@@ -51,5 +51,5 @@ void testParallelAccumulate()
         v[i] = i;
     }
 
-    std::cout << "testParallelAccumulate, result =  " << parallelAccumulate(v.begin(), v.end(), 1) << std::endl;
+    std::cout << "testParallelAccumulate, result =  " << parallel_accumulate(v.begin(), v.end(), 1) << std::endl;
 }

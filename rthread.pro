@@ -11,4 +11,5 @@ SOURCES += main.cpp \
 HEADERS += \
     pch.h \
     utils.h \
-    accumulate.h
+    accumulate.h \
+    stack.h
