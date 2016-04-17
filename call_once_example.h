@@ -22,6 +22,7 @@ private:
     void init_data(int value)
     {
         _data = value;
+        std::cout << "Value was set by thread id = " << std::this_thread::get_id() << std::endl;
     }
 
 private:
