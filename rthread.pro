@@ -12,4 +12,7 @@ HEADERS += \
     pch.h \
     utils.h \
     accumulate.h \
-    stack.h
+    stack.h \
+    call_once_example.h
+
+DISTFILES +=
