@@ -13,6 +13,7 @@ HEADERS += \
     utils.h \
     accumulate.h \
     stack.h \
-    call_once_example.h
+    call_once_example.h \
+    producer.h
 
 DISTFILES +=
