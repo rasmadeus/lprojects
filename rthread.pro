@@ -1,19 +1,12 @@
 TEMPLATE = app
-CONFIG += console c++11 precompile_header thread
+
+DESTDIR = $$PWD/bin
+
+CONFIG += console c++11
 CONFIG -= app_bundle
-CONFIG -= qt
 
-PRECOMPILED_HEADER = pch.h
+CONFIG += precompile_header
+PRECOMPILED_HEADER = src/pch.h
 
-SOURCES += main.cpp \
-    utils.cpp
-
-HEADERS += \
-    pch.h \
-    utils.h \
-    accumulate.h \
-    stack.h \
-    call_once_example.h \
-    producer.h
-
-DISTFILES +=
+SOURCES += \
+    src/main.cpp
