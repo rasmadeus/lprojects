@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <mutex>
+#include <ostream>
 #include <vector>
 #include <thread>
 

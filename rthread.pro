@@ -10,7 +10,9 @@ PRECOMPILED_HEADER = src/pch.h
 
 SOURCES += \
     src/main.cpp \
-    src/cond_var_example.cpp
+    src/cond_var_example.cpp \
+    src/lock_example.cpp
 
 HEADERS += \
-    src/cond_var_example.h
+    src/cond_var_example.h \
+    src/lock_example.h
