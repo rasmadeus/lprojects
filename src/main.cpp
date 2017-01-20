@@ -1,8 +1,6 @@
-#include "cond_var_example.h"
-#include "lock_example.h"
+#include "call_once.h"
 
 int main()
 {
-    CondVarExample::test();
-    Book::test();
+    CallOnce::test();
 }
