@@ -15,16 +15,14 @@ Future::Future(int n, std::launch launch)
 
 int Future::operator () () const
 {
-    auto summ = std::async(&Future::summ, this);
-    auto mult = std::async(&Future::mult, this);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    auto summ = std::async(launch, &Future::summ, this);
+    auto mult = std::async(launch, &Future::mult, this);
     return summ.get() + mult.get();
 }
 
 int Future::summ() const
 {
     show_thread();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     int summ = 0;
     for(int i = 0; i < n; ++i)
         summ += i;
@@ -34,7 +32,6 @@ int Future::summ() const
 int Future::mult() const
 {
     show_thread();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     int mult = 1;
     for(int i = 1; i < n; ++i)
         mult *= i;
