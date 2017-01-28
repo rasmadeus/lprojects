@@ -8,7 +8,7 @@ public:
     static void test();
 
 public:
-    Future(int n);
+    Future(int n, std::launch launch);
     int operator () () const;
 
 private:
@@ -20,6 +20,7 @@ private:
 
 private:
     int n;
+    std::launch launch;
 };
 
 #endif // FUTURE_H
