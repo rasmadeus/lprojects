@@ -2,6 +2,7 @@
 
 #include <condition_variable>
 #include <chrono>
+#include <deque>
 #include <iostream>
 #include <future>
 #include <mutex>

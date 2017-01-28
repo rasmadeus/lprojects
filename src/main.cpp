@@ -1,6 +1,6 @@
-#include "future.h"
+#include "gui_thread.h"
 
 int main()
 {
-    Future::test();
+    GuiThread::test();
 }
