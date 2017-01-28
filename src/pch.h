@@ -3,6 +3,7 @@
 #include <condition_variable>
 #include <chrono>
 #include <iostream>
+#include <future>
 #include <mutex>
 #include <ostream>
 #include <vector>

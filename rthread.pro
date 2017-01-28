@@ -12,9 +12,11 @@ SOURCES += \
     src/main.cpp \
     src/cond_var_example.cpp \
     src/lock_example.cpp \
-    src/call_once.cpp
+    src/call_once.cpp \
+    src/future.cpp
 
 HEADERS += \
     src/cond_var_example.h \
     src/lock_example.h \
-    src/call_once.h
+    src/call_once.h \
+    src/future.h

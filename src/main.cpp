@@ -1,6 +1,6 @@
-#include "call_once.h"
+#include "future.h"
 
 int main()
 {
-    CallOnce::test();
+    Future::test();
 }
