@@ -1,6 +1,6 @@
-#include "gui_thread.h"
+#include "asynch.h"
 
 int main()
 {
-    GuiThread::test();
+    BigCalc::test();
 }

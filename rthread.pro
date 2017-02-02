@@ -14,11 +14,13 @@ SOURCES += \
     src/lock_example.cpp \
     src/call_once.cpp \
     src/future.cpp \
-    src/gui_thread.cpp
+    src/gui_thread.cpp \
+    src/asynch.cpp
 
 HEADERS += \
     src/cond_var_example.h \
     src/lock_example.h \
     src/call_once.h \
     src/future.h \
-    src/gui_thread.h
+    src/gui_thread.h \
+    src/asynch.h
