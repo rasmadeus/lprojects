@@ -1,6 +1,6 @@
-#include "asynch.h"
+#include "promise.h"
 
 int main()
 {
-    BigCalc::test();
+    Promise::test();
 }

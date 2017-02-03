@@ -2,10 +2,16 @@
 #define PROMISE_H
 
 
-class promise
+class Promise
 {
 public:
-    promise();
+    static void test();
+
+public:
+    void calc(const std::vector<int>& data, std::promise<int> res_promise) const;
+
+private:
+    int accumulate(const std::vector<int>& data) const;
 };
 
 #endif // PROMISE_H

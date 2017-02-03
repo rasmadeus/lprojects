@@ -1,5 +1,6 @@
 #ifndef PCH_H
 
+#include <algorithm>
 #include <condition_variable>
 #include <chrono>
 #include <deque>

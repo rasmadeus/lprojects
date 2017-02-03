@@ -15,7 +15,8 @@ SOURCES += \
     src/call_once.cpp \
     src/future.cpp \
     src/gui_thread.cpp \
-    src/asynch.cpp
+    src/asynch.cpp \
+    src/promise.cpp
 
 HEADERS += \
     src/cond_var_example.h \
@@ -23,4 +24,5 @@ HEADERS += \
     src/call_once.h \
     src/future.h \
     src/gui_thread.h \
-    src/asynch.h
+    src/asynch.h \
+    src/promise.h
