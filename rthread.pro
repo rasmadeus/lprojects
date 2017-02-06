@@ -16,7 +16,8 @@ SOURCES += \
     src/future.cpp \
     src/gui_thread.cpp \
     src/asynch.cpp \
-    src/promise.cpp
+    src/promise.cpp \
+    src/pack_task.cpp
 
 HEADERS += \
     src/cond_var_example.h \
@@ -25,4 +26,5 @@ HEADERS += \
     src/future.h \
     src/gui_thread.h \
     src/asynch.h \
-    src/promise.h
+    src/promise.h \
+    src/pack_task.h
