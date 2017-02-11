@@ -8,6 +8,8 @@ CONFIG -= app_bundle
 CONFIG += precompile_header
 PRECOMPILED_HEADER = src/pch.h
 
+include(boost.pri)
+
 SOURCES += \
     src/main.cpp \
     src/cond_var_example.cpp \
