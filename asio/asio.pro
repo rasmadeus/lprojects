@@ -2,5 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     client \
-    server
-
+    server \
+    rtry

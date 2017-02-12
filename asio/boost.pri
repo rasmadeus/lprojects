@@ -3,4 +3,4 @@ INCLUDEPATH += \
 
 LIBS += \
     -L/opt/boost/1_63_0/bin/lib \
-    -lboost_regex
+    -lboost_system
