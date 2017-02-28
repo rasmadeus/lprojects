@@ -1,38 +1,29 @@
-struct Session
+std::string buffer_to_string(const boost::asio::streambuf& buffer)
 {
-    std::shared_ptr<boost::asio::ip::tcp::socket> sock;
-    std::string buf;
-    std::size_t total_bytes_written{ 0 };
-};
+  using boost::asio::buffers_begin;
 
-void callback(const boost::system::error_code& ec, std::size_t bytes_transfered, const std::shared_ptr<Session>& s)
-{
-    if (ec != 0)
-    {
-        std::cerr << "Error: " << ec.value() << std::endl;
-        return;
-    }
-
-    s->total_bytes_written += bytes_transfered;
-    if (s->total_bytes_written == s->buf.length())
-        return;
-
-    s->sock->async_write_some(
-        boost::asio::buffer(s->buf.c_str() + s->total_bytes_written, s->buf.length() - s->total_bytes_written),
-        std::bind(callback, std::placeholders::_1, std::placeholders::_2, s)
-    );
+  auto bufs = buffer.data();
+  std::string result(buffers_begin(bufs), buffers_begin(bufs) + buffer.size());
+  return result;
 }
 
-void write_to_socket(const std::shared_ptr<boost::asio::ip::tcp::socket>& sock)
+void communicate(boost::asio::ip::tcp::socket& sock)
 {
-    const auto s = std::make_shared<Session>();
-    s->buf = std::string{"Hello world!"};
-    s->total_bytes_written = 0;
-    s->sock = sock;
-    s->sock->async_write_some(
-        boost::asio::buffer(s->buf),
-        std::bind(callback, std::placeholders::_1, std::placeholders::_2, s)
-    );
+    const char request_buf[] = {0x48, 0x65, 0x0, 0x6c, 0x6c, 0x6f};
+
+    boost::asio::write(sock, boost::asio::buffer(request_buf));
+    sock.shutdown(boost::asio::socket_base::shutdown_send);
+    boost::asio::streambuf response_buf;
+    boost::system::error_code ec;
+    boost::asio::read(sock, response_buf, ec);
+    if (ec == boost::asio::error::eof)
+    {
+        std::cout << "Response came: " << buffer_to_string(response_buf) << std::endl;
+    }
+    else
+    {
+        std::cerr << "Error happened: " << ec.value() << std::endl;
+    }
 }
 
 int main()
@@ -44,10 +35,8 @@ int main()
     {
         boost::asio::ip::tcp::endpoint ep{boost::asio::ip::address::from_string(address), port};
         boost::asio::io_service ios;
-        const auto sock = std::make_shared<boost::asio::ip::tcp::socket>(ios, ep.protocol());
-        sock->connect(ep);
-        write_to_socket(sock);
-        ios.run();
+        boost::asio::ip::tcp::socket sock{ios, ep.protocol()};
+        sock.connect(ep);
     }
     catch(const boost::system::system_error& ex)
     {

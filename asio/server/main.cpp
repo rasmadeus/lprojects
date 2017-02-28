@@ -1,58 +1,29 @@
-struct Session
+void process_request(boost::asio::ip::tcp::socket& sock)
 {
-    std::shared_ptr<boost::asio::ip::tcp::socket> sock;
-    std::unique_ptr<char[]> buf;
-    std::size_t total_bytes_read;
-    unsigned int buf_size{ 0 };
-};
+    boost::asio::streambuf request_buf;
+    boost::system::error_code ec;
+    boost::asio::read(sock, request_buf, ec);
+    if (ec != boost::asio::error::eof)
+        throw boost::system::system_error{ec};
 
-void callback(const boost::system::error_code& ec, std::size_t bytes_transferred, const std::shared_ptr<Session>& s)
-{
-    if (ec != 0)
-    {
-        std::cerr << "Error: " << ec.value() << std::endl;
-        return;
-    }
-
-    s->total_bytes_read += bytes_transferred;
-    if (s->total_bytes_read == s->buf_size)
-        return;
-
-    s->sock->async_read_some(
-        boost::asio::buffer(s->buf.get() + s->total_bytes_read, s->buf_size - s->total_bytes_read),
-        std::bind(callback, std::placeholders::_1, std::placeholders::_2, s)
-    );
-}
-
-void read_from_socket(const std::shared_ptr<boost::asio::ip::tcp::socket>& sock)
-{
-    const auto s = std::make_shared<Session>();
-    const unsigned int size = 11;
-    s->buf.reset(new char[size]);
-    s->total_bytes_read = 0;
-    s->sock = sock;
-    s->buf_size = size;
-
-    s->sock->async_read_some(
-        boost::asio::buffer(s->buf.get(), s->buf_size),
-        std::bind(callback, std::placeholders::_1, std::placeholders::_2, s)
-    );
+    const char response_buf[] = {0x48, 0x69, 0x21};
+    boost::asio::write(sock, boost::asio::buffer(response_buf));
+    sock.shutdown(boost::asio::socket_base::shutdown_send);
 }
 
 
 int main()
 {
-    const std::string address{"127.0.0.1"};
     const short port = 3333;
 
     try
     {
-        boost::asio::ip::tcp::endpoint ep{boost::asio::ip::address::from_string(address), port};
+        boost::asio::ip::tcp::endpoint ep{boost::asio::ip::address_v4::any(), port};
         boost::asio::io_service ios;
-        const auto sock = std::make_shared<boost::asio::ip::tcp::socket>(ios, ep.protocol());
-        sock->connect(ep);
-        read_from_socket(sock);
-        ios.run();
+        boost::asio::ip::tcp::acceptor acceptor{ios, ep};
+        boost::asio::ip::tcp::socket sock{ios};
+        acceptor.accept(sock);
+        process_request(sock);
 
     }
     catch(const boost::system::system_error& ex)
