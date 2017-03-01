@@ -1,16 +1,80 @@
-void process_request(boost::asio::ip::tcp::socket& sock)
+class Service
 {
-    boost::asio::streambuf request_buf;
-    boost::system::error_code ec;
-    boost::asio::read(sock, request_buf, ec);
-    if (ec != boost::asio::error::eof)
-        throw boost::system::system_error{ec};
+public:
+    void handle_client(boost::asio::ip::tcp::socket& sock)
+    {
+        try
+        {
+            boost::asio::streambuf request;
+            boost::asio::read_until(sock, request, '\n');
+            int i{0};
+            while(i != 1000000)
+            {
+                ++i;
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                std::string response = "Hello from Server\n";
+                boost::asio::write(sock, boost::asio::buffer(response));
+            }
+        }
+        catch(const boost::system::system_error& ex)
+        {
+            std::cerr << "Error in service: " << ex.code() << ". " << ex.what() << std::endl;
+        }
+    }
+};
 
-    const char response_buf[] = {0x48, 0x69, 0x21};
-    boost::asio::write(sock, boost::asio::buffer(response_buf));
-    sock.shutdown(boost::asio::socket_base::shutdown_send);
-}
 
+class Acceptor
+{
+public:
+    Acceptor(boost::asio::io_service& ios, unsigned short port)
+        : m_ios{ios}
+        , m_acceptor{m_ios, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4::any(), port)}
+    {
+        m_acceptor.listen();
+    }
+
+    void accept()
+    {
+        boost::asio::ip::tcp::socket sock{m_ios};
+        m_acceptor.accept(sock);
+        Service svc;
+        svc.handle_client(sock);
+    }
+
+private:
+    boost::asio::io_service& m_ios;
+    boost::asio::ip::tcp::acceptor m_acceptor;
+};
+
+
+class Server
+{
+public:
+    void start(unsigned short port)
+    {
+        m_thread = std::make_unique<std::thread>(&Server::run, this, port);
+    }
+
+    void stop()
+    {
+        m_stop = true;
+        m_thread->join();
+    }
+
+private:
+    void run(unsigned short port)
+    {
+        Acceptor acc{m_ios, port};
+        while(!m_stop)
+            acc.accept();
+    }
+
+private:
+    std::unique_ptr<std::thread> m_thread;
+    std::atomic<bool> m_stop{false};
+    boost::asio::io_service m_ios;
+};
 
 int main()
 {
@@ -18,12 +82,10 @@ int main()
 
     try
     {
-        boost::asio::ip::tcp::endpoint ep{boost::asio::ip::address_v4::any(), port};
-        boost::asio::io_service ios;
-        boost::asio::ip::tcp::acceptor acceptor{ios, ep};
-        boost::asio::ip::tcp::socket sock{ios};
-        acceptor.accept(sock);
-        process_request(sock);
+        Server srv;
+        srv.start(port);
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+        srv.stop();
 
     }
     catch(const boost::system::system_error& ex)

@@ -1,30 +1,53 @@
-std::string buffer_to_string(const boost::asio::streambuf& buffer)
+class SyncTCPCient
 {
-  using boost::asio::buffers_begin;
-
-  auto bufs = buffer.data();
-  std::string result(buffers_begin(bufs), buffers_begin(bufs) + buffer.size());
-  return result;
-}
-
-void communicate(boost::asio::ip::tcp::socket& sock)
-{
-    const char request_buf[] = {0x48, 0x65, 0x0, 0x6c, 0x6c, 0x6f};
-
-    boost::asio::write(sock, boost::asio::buffer(request_buf));
-    sock.shutdown(boost::asio::socket_base::shutdown_send);
-    boost::asio::streambuf response_buf;
-    boost::system::error_code ec;
-    boost::asio::read(sock, response_buf, ec);
-    if (ec == boost::asio::error::eof)
+public:
+    SyncTCPCient(const std::string& raw_ip_address, unsigned short port_num)
+        : m_ep{boost::asio::ip::address::from_string(raw_ip_address), port_num}
+        , m_sock{m_ios}
     {
-        std::cout << "Response came: " << buffer_to_string(response_buf) << std::endl;
+        m_sock.open(m_ep.protocol());
     }
-    else
+
+    void connect()
     {
-        std::cerr << "Error happened: " << ec.value() << std::endl;
+        m_sock.connect(m_ep);
     }
-}
+
+    void close()
+    {
+        m_sock.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+        m_sock.close();
+    }
+
+    std::string emulate_long_computation_op(unsigned int duration_sec)
+    {
+        const std::string request = "EMULATE_LONG_COMP_OP " + std::to_string(duration_sec) + "\n";
+        send_request(request);
+        return receive_response();
+    }
+
+private:
+    void send_request(const std::string& request)
+    {
+        boost::asio::write(m_sock, boost::asio::buffer(request));
+    }
+
+    std::string receive_response()
+    {
+        boost::asio::streambuf buf;
+        boost::asio::read_until(m_sock, buf, '\n');
+        std::istream input{&buf};
+        std::string response;
+        std::getline(input, response);
+        return response;
+    }
+
+private:
+    boost::asio::io_service m_ios;
+    boost::asio::ip::tcp::endpoint m_ep;
+    boost::asio::ip::tcp::socket m_sock;
+};
+
 
 int main()
 {
@@ -33,10 +56,11 @@ int main()
 
     try
     {
-        boost::asio::ip::tcp::endpoint ep{boost::asio::ip::address::from_string(address), port};
-        boost::asio::io_service ios;
-        boost::asio::ip::tcp::socket sock{ios, ep.protocol()};
-        sock.connect(ep);
+        SyncTCPCient client{address, port};
+        client.connect();
+        std::cout << "Sending request to server..." << std::endl;
+        std::cout << "Response: " << client.emulate_long_computation_op(10);
+        client.close();
     }
     catch(const boost::system::system_error& ex)
     {
