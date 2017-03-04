@@ -2,5 +2,6 @@
 
 int main()
 {
-    timer::test();
+    timer::test_async(1);
+    timer::test_sync(1);
 }
