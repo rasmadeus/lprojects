@@ -12,7 +12,8 @@ include(../boost.pri)
 
 HEADERS += \
     pch.h \
-    resolver.h
+    resolver.h \
+    timer.h
 
 SOURCES += \
     main.cpp
