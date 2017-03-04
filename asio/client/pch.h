@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <boost/array.hpp>
 #include <boost/asio.hpp>
 
 #define PCH_H
